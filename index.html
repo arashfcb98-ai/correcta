@@ -1165,7 +1165,7 @@ function halamanLembar(kertas,sil,k,auto){
   return `<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Lembar Jawab ${sil?'Silang':'Bulatan'} ${kertas}</title><meta name="viewport" content="width=${pxW}">
 <style>
 @page{size:${W}mm ${H}mm;margin:0}
-*{box-sizing:border-box}html,body{margin:0;padding:0}
+*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0}
 body{font-family:Arial,Helvetica,"Liberation Sans",sans-serif;color:#000;background:#fff}
 .bar{padding:10px 14px;background:#12303f;color:#fff;font:600 14px/1.4 Arial,sans-serif;display:flex;gap:12px;align-items:center;flex-wrap:wrap;position:sticky;left:0}
 .bar button{font:700 14px Arial;padding:8px 16px;border:0;border-radius:10px;background:#7acff0;color:#0e2a3b}

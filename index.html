@@ -731,6 +731,36 @@ input:not([type=file]):focus,select:focus,textarea:focus{border-color:var(--acce
 .kp .ex{display:flex;align-items:center;gap:1mm;font-size:4.6pt;white-space:nowrap}
 .kp .ex .o{position:static;width:2.6mm;height:2.6mm;border-width:.2mm}
 .sh2{font-size:13px;opacity:.85;margin-top:10px}
+
+/* ===== Tampilan ringkas (compact) ===== */
+body{font-size:13.5px}
+.view{gap:8px;padding-top:2px}
+.page-h{padding:2px 2px 0}
+.page-h h1{font-size:22px;letter-spacing:-.03em}
+.page-h p{font-size:12.5px;margin-top:2px;line-height:1.4}
+.card{padding:14px;border-radius:20px}
+.card h2{font-size:15px}
+.stack{gap:9px}
+.f{gap:4px;font-size:12px}
+.muted{font-size:12.5px}
+input:not([type=file]),select,textarea{min-height:42px;padding:8px 12px;border-radius:14px}
+.btn{min-height:42px;padding:8px 14px;font-size:14px;border-radius:14px}
+.btn.small{min-height:36px}
+.seg{padding:3px}
+.seg button{min-height:36px;font-size:13px}
+.htabs{padding:4px}
+.htabs button{min-height:44px;font-size:12px;gap:2px}
+.htabs svg{width:16px;height:16px}
+@media (max-width:400px){.htabs button{min-height:46px;font-size:11.5px}}
+.note{padding:8px 11px;font-size:12.5px;border-radius:12px}
+.grid2{gap:8px}
+.dock-in .btn{min-height:42px}
+.dock{padding-block:8px}
+.stats.hero .stat.avg{min-height:170px}
+.stats.hero .stat:not(.avg){padding:8px 14px;min-height:50px}
+.stats.hero .stat:not(.avg) b{font-size:24px}
+.stats.hero .stat.avg b{font-size:34px}
+.sh{margin:4px 0 0}
 </style>
 </head>
 <body>
@@ -1518,7 +1548,7 @@ function scanKeyFile(f){
     }catch(err){console.error(err);if($('#keyMsg'))$('#keyMsg').innerHTML='<div class="note err">Foto tidak bisa diproses.</div>';}
   });
 }
-let pTab='jenis',draft=null;
+let pTab='lembar',draft=null;
 const PLUS='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
 const validEx=ex=>{const m=[];if(!String(ex.jenis||'').trim())m.push('jenis');if(!String(ex.mapel||'').trim())m.push('mapel');if(!String(ex.kelas||'').trim())m.push('kelas');return m;};
 const PI={
@@ -1529,24 +1559,22 @@ const PI={
 function renderPengaturan(){
   if(!draft&&!hasExam())draft=newExam({jenis:''});
   const ex=draft||exam(),v=$('#v-pengaturan');
-  if(draft)pTab='jenis';
+  if(draft&&pTab==='kunci')pTab='jenis';
   const preset=JENIS.includes(ex.jenis),jsel=!ex.jenis?'':preset?ex.jenis:'__lain';
   v.innerHTML=`
-   <div class="page-h"><h1>Pengaturan ujian</h1><p>Atur jenis ujian dan kunci jawaban. Perubahan tersimpan otomatis.</p></div>
+   <div class="page-h"><h1>Pengaturan ujian</h1><p>Atur lembar jawab, jenis ujian, lalu kunci jawaban. Perubahan tersimpan otomatis.</p></div>
    <div class="card"><div class="split">
       <label class="f">Ujian aktif<select id="exSel">${draft?`<option value="__draft" selected>${S.exams.length?'Ujian baru (belum disimpan)':'Belum ada ujian'}</option>`:''}${S.exams.map(e=>`<option value="${e.id}" ${!draft&&e.id===ex.id?'selected':''}>${esc(examName(e))}</option>`).join('')}</select></label>
       <button class="btn small ibtn" id="exNew" type="button" aria-label="Buat ujian baru" title="Buat ujian baru">${PLUS}</button></div></div>
    <div class="seg three htabs" id="pTabs" role="tablist" aria-label="Bagian pengaturan">
+     <button type="button" role="tab" data-t="lembar" aria-pressed="${pTab==='lembar'}">${PI.lembar}<span>Lembar Jawab</span></button>
      <button type="button" role="tab" data-t="jenis" aria-pressed="${pTab==='jenis'}">${PI.jenis}<span>Jenis Ujian</span></button>
-     <button type="button" role="tab" data-t="kunci" aria-pressed="${pTab==='kunci'}">${PI.kunci}<span>Kunci Jawaban</span></button>
-     <button type="button" role="tab" data-t="lembar" aria-pressed="${pTab==='lembar'}">${PI.lembar}<span>Lembar Jawab</span></button></div>
+     <button type="button" role="tab" data-t="kunci" aria-pressed="${pTab==='kunci'}">${PI.kunci}<span>Kunci Jawaban</span></button></div>
    <div class="card" data-sec="jenis"><h2>Jenis ujian</h2><div class="stack">
       <label class="f">Jenis<select id="exJenis"><option value="" disabled ${jsel===''?'selected':''}>Pilih jenis ujian…</option>${JENIS.map(j=>`<option ${j===jsel?'selected':''}>${esc(j)}</option>`).join('')}<option value="__lain" ${jsel==='__lain'?'selected':''}>Lainnya…</option></select></label>
       <label class="f" id="jenisLainBox" ${jsel==='__lain'?'':'hidden'}>Nama jenis ujian<input type="text" id="exJenisLain" value="${esc(preset?'':ex.jenis)}" placeholder="Misal: Remedial" autocomplete="off"></label>
       <div class="two"><label class="f">Mata pelajaran<input type="text" id="exMapel" value="${esc(ex.mapel)}" placeholder="Misal: Kimia" autocomplete="off"></label>
         <label class="f">Kelas<input type="text" id="exKelas" value="${esc(ex.kelas)}" placeholder="Misal: XI IPA" autocomplete="off"></label></div>
-      <label class="f">Jenis lembar jawab<select id="exSheet"><option value="bulat" ${ex.sheet!=='silang'?'selected':''}>Hitamkan bulatan</option><option value="silang" ${ex.sheet==='silang'?'selected':''}>Silang (X) di kotak</option></select></label>
-      <p class="muted" id="sheetNote" style="font-size:13px;margin:-4px 2px 10px">${ex.sheet==='silang'?'Siswa menyilang satu kotak. Untuk mengganti jawaban, hitamkan penuh kotak lama. Cetak lembar silang di tab Lembar Jawab.':'Siswa menghitamkan satu bulatan. Cetak lembar bulatan di tab Lembar Jawab.'}</p>
       <label class="f">Sekolah / instansi (opsional)<input type="text" id="exSek" value="${esc(ex.sekolah||'')}" placeholder="Misal: SMA Negeri 1 Contoh" autocomplete="off"></label>
       <div class="f">Jumlah soal
         <div class="seg" role="group" aria-label="Jumlah soal"><button type="button" data-n="40" aria-pressed="${ex.n===40}">40 soal</button><button type="button" data-n="50" aria-pressed="${ex.n===50}">50 soal</button></div></div>
@@ -1566,7 +1594,9 @@ function renderPengaturan(){
         <div id="keyMsg"></div>
         <button class="btn small danger" id="keyClear" type="button">Kosongkan kunci</button></div></div>
    <div class="card" data-sec="lembar"><h2>Lembar jawab</h2>
-      <p class="muted" style="margin-bottom:12px">Cetak 50 soal, tiga lembar per kertas. Aplikasi hanya membaca lembar dengan empat kotak hitam di sudut. Pilih jenis lembar yang sama dengan pengaturan ujian.</p>
+      <p class="muted" style="margin-bottom:12px">Cetak 50 soal, tiga lembar per kertas. Aplikasi hanya membaca lembar dengan empat kotak hitam di sudut.</p>
+      <label class="f">Jenis lembar jawab (untuk ujian ini)<select id="exSheet"><option value="bulat" ${ex.sheet!=='silang'?'selected':''}>Hitamkan bulatan</option><option value="silang" ${ex.sheet==='silang'?'selected':''}>Silang (X) di kotak</option></select></label>
+      <p class="muted" id="sheetNote" style="font-size:13px;margin:0 2px 12px">${ex.sheet==='silang'?'Siswa menyilang satu kotak. Untuk mengganti jawaban, hitamkan penuh kotak lama.':'Siswa menghitamkan satu bulatan.'}</p>
       <h3 class="sh">Kop lembar jawab (opsional)</h3>
       <p class="muted" style="font-size:13px;margin:0 0 10px">Isi untuk mencetak lembar berkop sekolah atau instansi Anda. Kosongkan semuanya untuk memakai lembar bawaan. Kop disimpan di HP ini saja.</p>
       <div class="stack kopf">
@@ -1579,7 +1609,7 @@ function renderPengaturan(){
         </div>
         <div class="kop-wrap" aria-label="Pratinjau kop"><div class="kop-prev kp" id="kopPrev"></div></div>
         <div class="grid2"><label class="f">Kertas<select id="kopKertas"><option value="A4">A4</option><option value="F4">F4</option></select></label><button class="btn primary" id="kopCetak" type="button" style="align-self:end">Cetak lembar berkop</button></div>
-        <p class="muted" style="font-size:12.5px;margin:0">Jenis lembar mengikuti pengaturan ujian (${ex.sheet==='silang'?'silang':'bulatan'}). Cetak dengan skala 100%, kertas lanskap, tanpa header dan footer.</p>
+        <p class="muted" style="font-size:12.5px;margin:0">Jenis lembar: ${ex.sheet==='silang'?'silang':'bulatan'} (sesuai pilihan di atas). Cetak dengan skala 100%, kertas lanskap, tanpa header dan footer.</p>
       </div>
       <h3 class="sh">Lembar bawaan tanpa kop</h3>
       <h3 class="sh sh2">Hitamkan bulatan${ex.sheet!=='silang'?' <span class="badge ok">dipakai ujian ini</span>':''}</h3>
@@ -1591,9 +1621,9 @@ function renderPengaturan(){
   const showSec=()=>{document.querySelectorAll('#v-pengaturan [data-sec]').forEach(el=>{el.hidden=el.dataset.sec!==pTab;});document.querySelectorAll('#pTabs button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.t===pTab)));
     window.__kopPrev&&setTimeout(window.__kopPrev,0);
     const dk=$('#dock');dk.dataset.tab=pTab;$('#dkSave').hidden=!(pTab==='jenis'&&(!!draft||validEx(ex).length>0));
-    $('#goScan').innerHTML=pTab==='jenis'?'Kunci Jawaban <span aria-hidden="true">→</span>':pTab==='kunci'?'Simpan &amp; Lanjut <span aria-hidden="true">→</span>':'Lanjut ke Pindai <span aria-hidden="true">→</span>';};
+    $('#goScan').innerHTML=pTab==='lembar'?'Jenis Ujian <span aria-hidden="true">→</span>':pTab==='jenis'?'Kunci Jawaban <span aria-hidden="true">→</span>':pTab==='kunci'?'Simpan &amp; Lanjut <span aria-hidden="true">→</span>':'Lanjut ke Pindai <span aria-hidden="true">→</span>';};
   document.querySelectorAll('#pTabs button').forEach(b=>b.onclick=()=>{
-    if(draft&&b.dataset.t!=='jenis'){toast('Lengkapi dan simpan jenis ujian dulu');showErr(validEx(ex));return;}
+    if(draft&&b.dataset.t==='kunci'){toast('Lengkapi dan simpan jenis ujian dulu');showErr(validEx(ex));return;}
     pTab=b.dataset.t;showSec();});
   const showErr=miss=>{
     ['exJenis','exJenisLain','exMapel','exKelas'].forEach(id=>{const el=$('#'+id);if(el)el.removeAttribute('aria-invalid');});
@@ -1649,7 +1679,7 @@ function renderPengaturan(){
   document.querySelectorAll('[data-logo-del]').forEach(b=>b.onclick=()=>{S.kop=Object.assign({},S.kop,{['logo'+b.dataset.logoDel]:''});save();renderPengaturan();});
   if($('#kopCetak'))$('#kopCetak').onclick=()=>{kopSimpan();bukaCetak($('#kopKertas').value,ex.sheet==='silang',kopData(ex));};
   window.__kopPrev=kopPrev;kopPrev();
-  $('#exSheet').onchange=e=>{ex.sheet=e.target.value==='silang'?'silang':'bulat';upd();const m=$('#sheetNote');if(m)m.textContent=ex.sheet==='silang'?'Siswa menyilang satu kotak. Untuk mengganti jawaban, hitamkan penuh kotak lama. Cetak lembar silang di tab Lembar Jawab.':'Siswa menghitamkan satu bulatan. Cetak lembar bulatan di tab Lembar Jawab.';};
+  $('#exSheet').onchange=e=>{ex.sheet=e.target.value==='silang'?'silang':'bulat';upd();const y=scrollY;renderPengaturan();scrollTo(0,y);};
   const setN=n=>{ex.n=n;pending=[];save();$('#exN').value=n;document.querySelectorAll('.seg button[data-n]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.n===n)));redraw();};
   document.querySelectorAll('.seg button[data-n]').forEach(b=>b.onclick=()=>setN(+b.dataset.n));
   $('#exN').onchange=e=>{const n=Math.max(1,Math.min(NMAX,parseInt(e.target.value)||NMAX));e.target.value=n;setN(n);};
@@ -1662,7 +1692,7 @@ function renderPengaturan(){
   const kc=$('#keyClear');let ka=false;kc.onclick=()=>{if(!ka){ka=true;kc.textContent='Ketuk lagi untuk mengosongkan';setTimeout(()=>{ka=false;kc.textContent='Kosongkan kunci';},3000);return;}ex.key=Array(NMAX).fill('');save();redraw();};
   $('#keyCam').onclick=()=>openCamera(scanKeyFile,{fallbackFor:'inKey'});
   $('#dkSave').onclick=()=>{if(commit())toast('Jenis ujian tersimpan');};
-  $('#goScan').onclick=()=>{if(!commit())return;
+  $('#goScan').onclick=()=>{if(pTab==='lembar'){pTab='jenis';showSec();toTop();return;}if(!commit())return;
     if(pTab==='jenis'){pTab='kunci';showSec();toTop();toast('Tersimpan. Lanjut isi kunci jawaban');return;}
     const k=keyDone(ex);toast(k>=ex.n?'Pengaturan tersimpan':'Pengaturan tersimpan, kunci belum lengkap');location.hash='#pindai';};
 }
